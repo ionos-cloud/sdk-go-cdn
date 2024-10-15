@@ -180,6 +180,8 @@ ctx = context.WithValue(context.Background(), {packageName}.ContextOperationServ
 var result Distributions = DistributionsGet(ctx)
                       .Offset(offset)
                       .Limit(limit)
+                      .FilterDomain(filterDomain)
+                      .FilterState(filterState)
                       .Execute()
 ```
 
@@ -203,10 +205,12 @@ import (
 func main() {
     offset := int32(0) // int32 | The first element (of the total list of elements) to include in the response. Use together with limit for pagination. (optional) (default to 0)
     limit := int32(100) // int32 | The maximum number of elements to return. Use together with offset for pagination. (optional) (default to 100)
+    filterDomain := "example.com" // string | filters resources by domain. (optional)
+    filterState := "AVAILABLE" // string | filters resources by state. (optional)
 
     configuration := ionoscloud.NewConfiguration("USERNAME", "PASSWORD", "TOKEN", "HOST_URL")
     apiClient := ionoscloud.NewAPIClient(configuration)
-    resource, resp, err := apiClient.DistributionsApi.DistributionsGet(context.Background()).Offset(offset).Limit(limit).Execute()
+    resource, resp, err := apiClient.DistributionsApi.DistributionsGet(context.Background()).Offset(offset).Limit(limit).FilterDomain(filterDomain).FilterState(filterState).Execute()
     if err != nil {
         fmt.Fprintf(os.Stderr, "Error when calling `DistributionsApi.DistributionsGet``: %v\n", err)
         fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", resp)
@@ -229,6 +233,8 @@ Other parameters are passed through a pointer to an apiDistributionsGetRequest s
 |------------- | ------------- | ------------- | -------------|
 | **offset** | **int32** | The first element (of the total list of elements) to include in the response. Use together with limit for pagination. | [default to 0]|
 | **limit** | **int32** | The maximum number of elements to return. Use together with offset for pagination. | [default to 100]|
+| **filterDomain** | **string** | filters resources by domain. | |
+| **filterState** | **string** | filters resources by state. | |
 
 ### Return type
 
@@ -283,7 +289,7 @@ import (
 )
 
 func main() {
-    distributionCreate := *openapiclient.NewDistributionCreate(*openapiclient.NewDistributionProperties("example.com", []openapiclient.RoutingRule{*openapiclient.NewRoutingRule("http/https", "/api", *openapiclient.NewUpstream("server.example.com", true, true, "RateLimitClass_example"))})) // DistributionCreate | Distribution to create.
+    distributionCreate := *openapiclient.NewDistributionCreate(*openapiclient.NewDistributionProperties("example.com", []openapiclient.RoutingRule{*openapiclient.NewRoutingRule("http/https", "/api", *openapiclient.NewUpstream("server.example.com", true, true, "RateLimitClass_example", "SniMode_example"))})) // DistributionCreate | Distribution to create.
 
     configuration := ionoscloud.NewConfiguration("USERNAME", "PASSWORD", "TOKEN", "HOST_URL")
     apiClient := ionoscloud.NewAPIClient(configuration)
@@ -364,7 +370,7 @@ import (
 
 func main() {
     distributionId := "9ba15778-16c4-543c-8775-e52acf4853f5" // string | The ID (UUID) of the Distribution.
-    distributionUpdate := *openapiclient.NewDistributionUpdate("9ba15778-16c4-543c-8775-e52acf4853f5", *openapiclient.NewDistributionProperties("example.com", []openapiclient.RoutingRule{*openapiclient.NewRoutingRule("http/https", "/api", *openapiclient.NewUpstream("server.example.com", true, true, "RateLimitClass_example"))})) // DistributionUpdate | update Distribution
+    distributionUpdate := *openapiclient.NewDistributionUpdate("9ba15778-16c4-543c-8775-e52acf4853f5", *openapiclient.NewDistributionProperties("example.com", []openapiclient.RoutingRule{*openapiclient.NewRoutingRule("http/https", "/api", *openapiclient.NewUpstream("server.example.com", true, true, "RateLimitClass_example", "SniMode_example"))})) // DistributionUpdate | update Distribution
 
     configuration := ionoscloud.NewConfiguration("USERNAME", "PASSWORD", "TOKEN", "HOST_URL")
     apiClient := ionoscloud.NewAPIClient(configuration)
