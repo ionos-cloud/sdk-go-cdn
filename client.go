@@ -50,7 +50,7 @@ const (
 	RequestStatusFailed  = "FAILED"
 	RequestStatusDone    = "DONE"
 
-	Version = "1.1.0"
+	Version = "1.2.0"
 )
 
 // APIClient manages communication with the IONOS Cloud - CDN Distribution API API v1.2.0
