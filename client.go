@@ -106,28 +106,20 @@ type TLSDial func(ctx context.Context, network, addr string) (net.Conn, error)
 // the remote server provides a certificate whose SHA256 fingerprint matches
 // the provided value.
 //
+// Standard TLS hostname and CA-chain verification remain active. The pinned
+// fingerprint is enforced as an additional constraint via VerifyConnection,
+// which runs after the standard handshake succeeds.
+//
 // The returned dialer function can be plugged into a http.Transport's DialTLS
 // field to allow for certificate pinning.
 func addPinnedCertVerification(fingerprint []byte, tlsConfig *tls.Config) TLSDial {
+	fingerprint = bytes.ReplaceAll(fingerprint, []byte(":"), []byte(""))
+	fingerprint = bytes.ReplaceAll(fingerprint, []byte(" "), []byte(""))
+	tlsConfig.VerifyConnection = func(cs tls.ConnectionState) error {
+		return verifyPinnedCert(fingerprint, cs.PeerCertificates)
+	}
 	return func(ctx context.Context, network, addr string) (net.Conn, error) {
-		//fingerprints can be added with ':', we need to trim
-		fingerprint = bytes.ReplaceAll(fingerprint, []byte(":"), []byte(""))
-		fingerprint = bytes.ReplaceAll(fingerprint, []byte(" "), []byte(""))
-		//we are manually checking a certificate, so we need to enable insecure
-		tlsConfig.InsecureSkipVerify = true
-
-		// Dial the connection to get certificates to check
-		conn, err := tls.Dial(network, addr, tlsConfig)
-		if err != nil {
-			return nil, err
-		}
-
-		if err := verifyPinnedCert(fingerprint, conn.ConnectionState().PeerCertificates); err != nil {
-			_ = conn.Close()
-			return nil, err
-		}
-
-		return conn, nil
+		return tls.Dial(network, addr, tlsConfig)
 	}
 }
 
